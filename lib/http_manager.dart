@@ -135,17 +135,17 @@ class HttpManager {
 
         message ??= response.data["errors"]?.toString() ?? 'Request failed';
       }
-      baseResult = BaseResult(
+      baseResult = BaseRes(
           success: false,
           data: response.data?["data"] ?? message ?? "",
           code: code,
-          message: message);
+          errorMsg: message);
     }
     return baseResult;
   }
 
   /// 处理网络请求失败的结果
-  BaseResult _handleError(dynamic err) {
+  BaseRes _handleError(dynamic err) {
     int? statusCode;
     String? errorCode;
     String? errorMessage;
@@ -196,11 +196,10 @@ class HttpManager {
           break;
       }
     }
-    return BaseResult(
+    return BaseRes(
         success: false,
         code: errorCode,
-        statusCode: statusCode,
-        message: errorMessage);
+        errorMsg: errorMessage);
   }
 
   /// 设置header
