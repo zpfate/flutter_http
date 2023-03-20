@@ -2,13 +2,14 @@
 
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:global_x_flutter_module/network/base_result.dart';
-import 'package:global_x_flutter_module/network/http.dart';
-import 'package:global_x_flutter_module/network/http_method.dart';
+
+import 'base_res.dart';
+import 'http_method.dart';
 import 'net_config.dart';
+
+typedef Parameters = Map<String, dynamic>;
 
 class HttpManager {
   /// 私有化构造函数
@@ -54,7 +55,7 @@ class HttpManager {
   }
 
   /// Request 操作
-  Future<BaseResult> request(
+  Future<BaseRes> request(
       String path, {
         String? baseUrl,
         required HttpMethod method,
@@ -92,34 +93,34 @@ class HttpManager {
   }
 
   /// 网络请求结果
-  BaseResult _handleResponse(Response response) {
-    BaseResult baseResult;
+  BaseRes _handleResponse(Response response) {
+    BaseRes baseResult;
     int statusCode = response.statusCode ?? 0;
     if (statusCode >= 200 && statusCode < 300) {
       if (response.data is Map) {
         String? code = response.data[NetConfig.codeKey];
         String? message = response.data[NetConfig.messageKey];
         dynamic data = response.data[NetConfig.dataKey];
-        baseResult = BaseResult(
+        baseResult = BaseRes(
             success: code == NetConfig.successCode ? true : false,
             data: data,
             code: code,
-            message: message,
-            statusCode: statusCode);
+            errorMsg: message,
+           );
       } else if (response.data is String) {
         Map tempResponse = json.decode(response.data);
         String? code = tempResponse[NetConfig.codeKey];
         String? message = tempResponse[NetConfig.messageKey];
         dynamic data = response.data[NetConfig.dataKey];
-        baseResult = BaseResult(
+        baseResult = BaseRes(
             success: true,
             data: data,
             code: code,
-            message: message,
-            statusCode: statusCode);
+            errorMsg: message,
+           );
       } else {
-        baseResult = BaseResult(
-            success: false, data: null, code: "-1", message: "Request failed");
+        baseResult = BaseRes(
+            success: false, data: null, code: "-1", errorMsg: "Request failed");
       }
     } else {
       /// 失败逻辑
